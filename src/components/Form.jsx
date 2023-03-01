@@ -1,44 +1,47 @@
 import React, { useState } from "react";
 import "./Form.css"; // CSS to style the form and inputs
+import PasswordStrengthBar from "react-password-strength-bar";
 import Swal from "sweetalert2";
 
 function Form() {
+  // Using Hooks to manage State and log the data on Console
+  const [inputValue, setInputValue] = useState({
+    username: "",
+    email: "",
+    password: "",
+    message: "",
+  });
 
-// Using Hooks to manage State and log the data on Console
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setInputValue((prevState) => ({ ...prevState, [name]: value }));
 
-  const onNameChange = (event) => {
-    setName(event.target.value);
-  };
+    // console.log(name + " = " + value);
+  }
 
-  const onEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
-
-  const onPasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const onMessageChange = (event) => {
-    setMessage(event.target.value);
-  };
+  //Shows Password Strength Meter on Click
+  const [isShown, setIsShown] = useState(false);
+  function handleClick() {
+    setIsShown((current) => !current);
+  }
 
   const submitForm = (event) => {
-
     // prevent default form behavior
     event.preventDefault();
 
     // form validation to ensure all fields are filled out before submission
-    if (!name || !email || !password || !message) {
+    if (
+      !inputValue.username ||
+      !inputValue.email ||
+      !inputValue.password ||
+      !inputValue.message
+    ) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Please Fill all the Fields",
       });
-    } 
+    }
     // Confirmation message after successful submission.
     else {
       Swal.fire({
@@ -50,18 +53,21 @@ function Form() {
 
       console.log(
         "Name: " +
-          name +
+          inputValue.username +
           "\nEmail: " +
-          email +
+          inputValue.email +
           "\nPassword: " +
-          password +
+          inputValue.password +
           "\nMessage: " +
-          message
+          inputValue.message
       );
-      setName("");
-      setEmail("");
-      setPassword("");
-      setMessage("");
+      setInputValue({
+        username: "",
+        email: "",
+        password: "",
+        message: "",
+      });
+      setIsShown(false); //Hides Password Strength Meter
     }
   };
 
@@ -84,10 +90,10 @@ function Form() {
               </label>
               <input
                 type="text"
-                name="txtName"
+                name="username"
                 className="form-control"
-                onChange={onNameChange}
-                value={name}
+                onChange={handleChange}
+                value={inputValue.username}
               />
             </div>
             <div className="form-group">
@@ -96,10 +102,10 @@ function Form() {
               </label>
               <input
                 type="email"
-                name="txtEmail"
+                name="email"
                 className="form-control"
-                onChange={onEmailChange}
-                value={email}
+                onChange={handleChange}
+                value={inputValue.email}
               />
             </div>
             <div className="form-group">
@@ -108,22 +114,29 @@ function Form() {
               </label>
               <input
                 type="password"
-                name="txtPassword"
+                name="password"
                 className="form-control"
-                onChange={onPasswordChange}
-                value={password}
-              />
+                onChange={handleChange}
+                value={inputValue.password}
+                onClick={handleClick}
+              />{" "}
+              {isShown && (
+                <PasswordStrengthBar
+                  password={inputValue.password}
+                  style={{ width: "50%", margin: "auto" }}
+                />
+              )}
             </div>
             <div className="form-group">
               <label>
                 Message <span style={{ color: "#e15563" }}>*</span>
               </label>
               <textarea
-                name="txtMsg"
+                name="message"
                 className="form-control"
                 style={{ width: "50%", height: "190px" }}
-                onChange={onMessageChange}
-                value={message}
+                onChange={handleChange}
+                value={inputValue.message}
                 // aria-label="Tell us what's on your mind"
               ></textarea>
             </div>
